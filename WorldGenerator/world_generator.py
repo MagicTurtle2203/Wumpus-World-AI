@@ -8,8 +8,13 @@ def generate_worlds(num_files: int, base_filename: str) -> None:
     Generates N number of random worlds specified by num_files.
     Each world will be a text file named base_filename followed by a number.
     """
-    if not (Path(__file__).parent / 'worlds').exists():
-        (Path(__file__).parent / 'worlds').mkdir()
+    world_directory = Path(__file__).parent / 'worlds'
+
+    if not world_directory.exists():
+        world_directory.mkdir()
+    else:
+        for file in world_directory.iterdir():
+            file.unlink()
 
     for num in range(1, num_files + 1):
         generate_world_file(f"{base_filename}_{num}.txt")
