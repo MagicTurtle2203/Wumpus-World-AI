@@ -47,7 +47,7 @@ def generate_world_file(filename: str) -> None:
     world[gold] = 'G'
 
     with open(world_path, 'w') as file:
-        for line in [world[i:i + 4] for i in range(0, len(world), 4)][::-1]:    # Splits list into 4 equal segments
+        for line in [world[i:i + 4] for i in range(0, len(world), 4)]:    # Splits list into 4 equal segments
             file.write(''.join(line) + '\n')
 
 
