@@ -33,7 +33,7 @@ class TestWorldParser(unittest.TestCase):
 
             def get_action(self, senses):
                 self.received_senses = senses
-                return ActionType.LEAVE
+                return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -59,7 +59,59 @@ class TestWorldParser(unittest.TestCase):
 
             def get_action(self, senses):
                 self.received_senses = senses
-                return ActionType.LEAVE
+                return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0W0G\n")
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("0000\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual(AI_agent.received_senses, [True, False, False, False, False])
+        finally:
+            test_file.unlink()
+
+    def test_agent_receives_correct_senses3(self):
+        class AI:
+            def __init__(self):
+                self.received_senses = None
+
+            def get_action(self, senses):
+                self.received_senses = senses
+                return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("000G\n")
+            file.write("P000\n")
+            file.write("W000\n")
+            file.write("0000\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual(AI_agent.received_senses, [False, True, False, False, False])
+        finally:
+            test_file.unlink()
+
+    def test_agent_receives_correct_senses4(self):
+        class AI:
+            def __init__(self):
+                self.received_senses = None
+
+            def get_action(self, senses):
+                self.received_senses = senses
+                return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -78,6 +130,207 @@ class TestWorldParser(unittest.TestCase):
         finally:
             test_file.unlink()
 
+    def test_agent_senses_glitter_when_on_gold_tile(self):
+        class AI:
+            def __init__(self):
+                self.received_senses = None
+                self.move_count = 0
+
+            def get_action(self, senses):
+                self.received_senses = senses
+
+                if self.move_count == 0:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                else:
+                    return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0G0W\n")
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("0000\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual(AI_agent.received_senses, [False, False, True, False, False])
+        finally:
+            test_file.unlink()
+
+    def test_agent_turns_correctly1(self):
+        class AI:
+            def __init__(self):
+                self.move_count = 0
+
+            def get_action(self, senses):
+                if self.move_count == 0:
+                    self.move_count += 1
+                    return ActionType.TURNLEFT
+                else:
+                    return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0W0G\n")
+            file.write("P000\n")
+            file.write("0000\n")
+            file.write("0000\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual(world.agent.direction_index, 3)
+        finally:
+            test_file.unlink()
+
+    def test_agent_turns_correctly2(self):
+        class AI:
+            def __init__(self):
+                self.move_count = 0
+
+            def get_action(self, senses):
+                if self.move_count == 0:
+                    self.move_count += 1
+                    return ActionType.TURNRIGHT
+                else:
+                    return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0W0G\n")
+            file.write("P000\n")
+            file.write("0000\n")
+            file.write("0000\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual(world.agent.direction_index, 1)
+        finally:
+            test_file.unlink()
+
+    def test_agent_moves_to_correct_location1(self):
+        class AI:
+            def __init__(self):
+                self.move_count = 0
+
+            def get_action(self, senses):
+                if self.move_count == 0:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                else:
+                    return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0000\n")
+            file.write("P000\n")
+            file.write("0000\n")
+            file.write("0W0G\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual((world.agent.X, world.agent.Y), (1, 0))
+            self.assertEqual(world.agent.direction_index, 0)
+        finally:
+            test_file.unlink()
+
+    def test_agent_moves_to_correct_location2(self):
+        class AI:
+            def __init__(self):
+                self.move_count = 0
+
+            def get_action(self, senses):
+                if self.move_count == 0:
+                    self.move_count += 1
+                    return ActionType.TURNLEFT
+                elif self.move_count == 1:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                else:
+                    return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("0W0G\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual((world.agent.X, world.agent.Y), (0, 1))
+            self.assertEqual(world.agent.direction_index, 3)
+        finally:
+            test_file.unlink()
+
+    def test_agent_moves_to_correct_location3(self):
+        class AI:
+            def __init__(self):
+                self.move_count = 0
+
+            def get_action(self, senses):
+                if self.move_count == 0:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                elif self.move_count == 1:
+                    self.move_count += 1
+                    return ActionType.TURNLEFT
+                elif self.move_count == 2:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                elif self.move_count == 3:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                elif self.move_count == 4:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                else:
+                    return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0000\n")
+            file.write("w000\n")
+            file.write("0000\n")
+            file.write("0G00\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual((world.agent.X, world.agent.Y), (1, 3))
+            self.assertEqual(world.agent.direction_index, 3)
+        finally:
+            test_file.unlink()
+
+    def test_agent_dies_when_walking_into_pit(self):
+        pass
+
+    def test_agent_dies_when_walking_into_wumpus(self):
+        pass
+
     def test_agent_receives_bump_when_walking_into_a_wall1(self):
         class AI:
             def __init__(self):
@@ -94,7 +347,7 @@ class TestWorldParser(unittest.TestCase):
                     self.move_count += 1
                     return ActionType.FORWARD
                 else:
-                    return ActionType.LEAVE
+                    return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -129,7 +382,7 @@ class TestWorldParser(unittest.TestCase):
                     self.move_count += 1
                     return ActionType.FORWARD
                 else:
-                    return ActionType.LEAVE
+                    return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -161,7 +414,7 @@ class TestWorldParser(unittest.TestCase):
                     self.move_count += 1
                     return ActionType.FORWARD
                 else:
-                    return ActionType.LEAVE
+                    return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -196,7 +449,7 @@ class TestWorldParser(unittest.TestCase):
                     self.move_count += 1
                     return ActionType.FORWARD
                 else:
-                    return ActionType.LEAVE
+                    return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -228,7 +481,7 @@ class TestWorldParser(unittest.TestCase):
                     self.move_count += 1
                     return ActionType.SHOOT
                 else:
-                    return ActionType.LEAVE
+                    return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -263,7 +516,7 @@ class TestWorldParser(unittest.TestCase):
                     self.move_count += 1
                     return ActionType.SHOOT
                 else:
-                    return ActionType.LEAVE
+                    return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -307,7 +560,7 @@ class TestWorldParser(unittest.TestCase):
                     self.move_count += 1
                     return ActionType.SHOOT
                 else:
-                    return ActionType.LEAVE
+                    return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 
@@ -354,7 +607,7 @@ class TestWorldParser(unittest.TestCase):
                     self.move_count += 1
                     return ActionType.SHOOT
                 else:
-                    return ActionType.LEAVE
+                    return 0
 
         test_file = Path(__file__).parent / 'test_world.txt'
 

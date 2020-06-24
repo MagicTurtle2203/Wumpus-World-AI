@@ -64,13 +64,6 @@ class World:
                     if self.agent.X + 1 > 3:
                         self.send_bump = True
                     self.agent.X = min(self.agent.X + 1, 3)
-
-                if self.board[self.agent.Y][self.agent.X] in (self.TileType.WUMPUS, self.TileType.PIT):
-                    self.score -= 1000
-                    break
-                # TODO: Check if agent moved into squares adjacent to pit or wumpus and
-                #       send breeze or stench signals
-                #       Check if agent moved into gold square and send glitter signal
             elif action == ActionType.TURNLEFT:
                 self.agent.direction_index = (self.agent.direction_index - 1) % 4
             elif action == ActionType.TURNRIGHT:
@@ -103,9 +96,15 @@ class World:
                 if (self.agent.X, self.agent.Y) == (0, 0) and self.agent.has_gold:
                     self.score += 1000
                     break
-            elif action == ActionType.LEAVE:
+            else:
+                break
+
+            if self.board[self.agent.Y][self.agent.X] in (self.TileType.WUMPUS, self.TileType.PIT):
                 self.score -= 1000
                 break
+            # TODO: Check if agent moved into squares adjacent to pit or wumpus and
+            #       send breeze or stench signals
+            #       Check if agent moved into gold square and send glitter signal
 
         return self.score
 
