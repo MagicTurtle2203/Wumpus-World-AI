@@ -8,3 +8,4 @@ class ActionType(Enum):
     GRAB = auto()
     SHOOT = auto()
     CLIMB = auto()
+    LEAVE = auto()
