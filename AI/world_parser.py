@@ -101,7 +101,7 @@ class World:
                 if (self.agent.X, self.agent.Y) == (0, 0) and self.agent.has_gold:
                     self.score += 1000
                     break
-            else:
+            else:   # For testing only
                 break
 
         return self.score
@@ -112,9 +112,18 @@ class World:
         The list follows a format of [stench, breeze, glitter, bump, scream], as specified in the
         book Artificial Intelligence: A Modern Approach by Peter Norvig and Stuart J. Russell.
         """
-        # TODO: Check if agent moved into squares adjacent to pit or wumpus and
-        #       send breeze or stench signals
-        #       Check if agent moved into gold square and send glitter signal
+        for (x, y) in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
+            new_x = x + self.agent.X
+            new_y = y + self.agent.Y
+
+            if 0 <= new_x < 4 and 0 <= new_y < 4:
+                if self.board[new_y][new_x] == self.TileType.WUMPUS:
+                    self.send_stench = True
+                elif self.board[new_y][new_x] == self.TileType.PIT:
+                    self.send_breeze = True
+
+        if self.board[self.agent.Y][self.agent.X] == self.TileType.GOLD:
+            self.send_glitter = True
 
         senses = [
             True if self.send_stench else False,
