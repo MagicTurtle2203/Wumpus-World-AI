@@ -24,10 +24,13 @@ class World:
         WUMPUS = auto()
         PIT = auto()
 
-    def __init__(self, filename, debug=False):
-        self.AI = AI()
+    def __init__(self, filename, _AI=AI, debug=False):
+        self.AI = _AI()
         self.agent = Agent()
         self.score = 0
+
+        self.wumpus_X = 0
+        self.wumpus_Y = 0
 
         self.send_breeze = False
         self.send_bump = False
@@ -38,7 +41,7 @@ class World:
         with open(filename) as file:
             self.board = self.create_board(file)
 
-    def run(self):
+    def run(self) -> int:
         while True:
             action = self.AI.get_action(self.get_senses())  # TODO: write get_senses function
             self.score -= 1
@@ -77,7 +80,24 @@ class World:
                     self.board[self.agent.X][self.agent.Y] == self.TileType.BLANK
             elif action == ActionType.SHOOT:
                 if self.agent.has_arrow:
-                    pass    # TODO: Check if wumpus is in front of agent. If it is, kill it and send scream signal.
+                    self.agent.has_arrow = False
+
+                    if self.agent.direction_index == 3:     # UP
+                        if self.agent.X == self.wumpus_X and self.agent.Y < self.wumpus_Y:
+                            self.board[self.wumpus_X][self.wumpus_Y] = self.TileType.BLANK
+                            self.send_scream = True
+                    elif self.agent.direction_index == 1:   # DOWN
+                        if self.agent.X == self.wumpus_X and self.agent.Y > self.wumpus_Y:
+                            self.board[self.wumpus_X][self.wumpus_Y] = self.TileType.BLANK
+                            self.send_scream = True
+                    elif self.agent.direction_index == 2:   # LEFT
+                        if self.agent.X > self.wumpus_X and self.agent.Y == self.wumpus_Y:
+                            self.board[self.wumpus_X][self.wumpus_Y] = self.TileType.BLANK
+                            self.send_scream = True
+                    elif self.agent.direction_index == 0:   # RIGHT
+                        if self.agent.X < self.wumpus_X and self.agent.Y == self.wumpus_Y:
+                            self.board[self.wumpus_X][self.wumpus_Y] = self.TileType.BLANK
+                            self.send_scream = True
             elif action == ActionType.CLIMB:
                 if (self.agent.X, self.agent.Y) == (0, 0) and self.agent.has_gold:
                     self.score += 1000
@@ -97,5 +117,15 @@ class World:
         }
 
         board = [[tile_dict.get(char) for char in line.strip()] for line in file]
+
+        for row_idx, row in enumerate(board):
+            for col_idx, item in enumerate(board[row_idx]):
+                if item == self.TileType.WUMPUS:
+                    self.wumpus_X = col_idx
+                    self.wumpus_Y = row_idx
+                    break
+            else:
+                continue
+            break
 
         return board
