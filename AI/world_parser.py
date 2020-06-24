@@ -64,6 +64,10 @@ class World:
                     if self.agent.X + 1 > 3:
                         self.send_bump = True
                     self.agent.X = min(self.agent.X + 1, 3)
+
+                if self.board[self.agent.Y][self.agent.X] in (self.TileType.WUMPUS, self.TileType.PIT):
+                    self.score -= 1000
+                    break
             elif action == ActionType.TURNLEFT:
                 self.agent.direction_index = (self.agent.direction_index - 1) % 4
             elif action == ActionType.TURNRIGHT:
@@ -74,6 +78,7 @@ class World:
                     self.board[self.agent.Y][self.agent.X] == self.TileType.BLANK
             elif action == ActionType.SHOOT:
                 if self.agent.has_arrow:
+                    self.score -= 10
                     self.agent.has_arrow = False
 
                     if self.agent.direction_index == 3:     # UP
@@ -99,13 +104,6 @@ class World:
             else:
                 break
 
-            if self.board[self.agent.Y][self.agent.X] in (self.TileType.WUMPUS, self.TileType.PIT):
-                self.score -= 1000
-                break
-            # TODO: Check if agent moved into squares adjacent to pit or wumpus and
-            #       send breeze or stench signals
-            #       Check if agent moved into gold square and send glitter signal
-
         return self.score
 
     def get_senses(self) -> [bool]:
@@ -114,6 +112,10 @@ class World:
         The list follows a format of [stench, breeze, glitter, bump, scream], as specified in the
         book Artificial Intelligence: A Modern Approach by Peter Norvig and Stuart J. Russell.
         """
+        # TODO: Check if agent moved into squares adjacent to pit or wumpus and
+        #       send breeze or stench signals
+        #       Check if agent moved into gold square and send glitter signal
+
         senses = [
             True if self.send_stench else False,
             True if self.send_breeze else False,

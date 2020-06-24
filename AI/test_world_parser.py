@@ -326,10 +326,48 @@ class TestWorldParser(unittest.TestCase):
             test_file.unlink()
 
     def test_agent_dies_when_walking_into_pit(self):
-        pass
+        class AI:
+            def get_action(self, senses):
+                return ActionType.FORWARD
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0P0G\n")
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("0000\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            score = world.run()
+
+            self.assertLess(score, -1000)
+        finally:
+            test_file.unlink()
 
     def test_agent_dies_when_walking_into_wumpus(self):
-        pass
+        class AI:
+            def get_action(self, senses):
+                return ActionType.FORWARD
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0W0G\n")
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("0000\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            score = world.run()
+
+            self.assertLess(score, -1000)
+        finally:
+            test_file.unlink()
 
     def test_agent_receives_bump_when_walking_into_a_wall1(self):
         class AI:
