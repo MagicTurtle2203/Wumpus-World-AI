@@ -390,10 +390,10 @@ class TestWorldParser(unittest.TestCase):
         test_file = Path(__file__).parent / 'test_world.txt'
 
         with open(test_file, 'w') as file:
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("0000\n")
             file.write("0W0G\n")
-            file.write("P000\n")
-            file.write("0000\n")
-            file.write("0000\n")
 
         try:
             AI_agent = AI()
@@ -426,7 +426,7 @@ class TestWorldParser(unittest.TestCase):
 
         with open(test_file, 'w') as file:
             file.write("0000\n")
-            file.write("P000\n")
+            file.write("0000\n")
             file.write("0000\n")
             file.write("0W0G\n")
 
@@ -458,7 +458,7 @@ class TestWorldParser(unittest.TestCase):
 
         with open(test_file, 'w') as file:
             file.write("0000\n")
-            file.write("P000\n")
+            file.write("0000\n")
             file.write("0000\n")
             file.write("0W0G\n")
 
@@ -661,6 +661,88 @@ class TestWorldParser(unittest.TestCase):
             world.run()
 
             self.assertEqual(AI_agent.received_senses, [False, False, False, False, True])
+        finally:
+            test_file.unlink()
+
+    def test_agent_cannot_shoot_arrow_twice(self):
+        class AI:
+            def __init__(self):
+                self.move_count = 0
+                self.received_senses = None
+
+            def get_action(self, senses):
+                self.received_senses = senses
+
+                if self.move_count == 0:
+                    self.move_count += 1
+                    return ActionType.SHOOT
+                elif self.move_count == 1:
+                    self.move_count += 1
+                    return ActionType.TURNLEFT
+                elif self.move_count == 2:
+                    self.move_count += 1
+                    return ActionType.SHOOT
+                else:
+                    return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("W00G\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            world.run()
+
+            self.assertEqual(AI_agent.received_senses, [False, False, False, False, False])
+        finally:
+            test_file.unlink()
+
+    def test_agent_can_grab_gold_and_exit(self):
+        class AI:
+            def __init__(self):
+                self.move_count = 0
+
+            def get_action(self, senses):
+                if self.move_count == 0:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                elif self.move_count == 1:
+                    self.move_count += 1
+                    return ActionType.GRAB
+                elif self.move_count == 2:
+                    self.move_count += 1
+                    return ActionType.TURNRIGHT
+                elif self.move_count == 3:
+                    self.move_count += 1
+                    return ActionType.TURNRIGHT
+                elif self.move_count == 4:
+                    self.move_count += 1
+                    return ActionType.FORWARD
+                elif self.move_count == 5:
+                    self.move_count += 1
+                    return ActionType.CLIMB
+                else:
+                    return 0
+
+        test_file = Path(__file__).parent / 'test_world.txt'
+
+        with open(test_file, 'w') as file:
+            file.write("0G00\n")
+            file.write("0000\n")
+            file.write("0000\n")
+            file.write("000W\n")
+
+        try:
+            AI_agent = AI()
+            world = World(test_file, AI_agent)
+            score = world.run()
+
+            self.assertGreater(score, 900)
         finally:
             test_file.unlink()
 
