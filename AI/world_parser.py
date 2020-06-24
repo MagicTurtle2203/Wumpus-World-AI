@@ -5,12 +5,13 @@ from ai import AI
 
 
 class Agent:
+    DIRECTIONS = ["RIGHT", "DOWN", "LEFT", "UP"]
+
     def __init__(self):
         self.X = 0
         self.Y = 0
 
-        # DIRECTIONS = ["RIGHT", "DOWN", "LEFT", "UP"]
-        self.direction_index = 0    # Decided to use ints rather than an enum to facilitate easier turning
+        self.direction_index = 0    # Decided to use ints rather than an enum to make turning easier
 
         self.has_arrow = True
         self.has_gold = False
@@ -63,6 +64,9 @@ class World:
                 if self.board[self.agent.X][self.agent.Y] in (self.TileType.WUMPUS, self.TileType.PIT):
                     self.score -= 1000
                     break
+                # TODO: Check if agent moved into squares adjacent to pit or wumpus and
+                #       send breeze or stench signals
+                #       Check if agent moved into gold square and send glitter signal
             elif action == ActionType.TURNLEFT:
                 self.agent.direction_index = (self.agent.direction_index - 1) % 4
             elif action == ActionType.TURNRIGHT:
@@ -73,7 +77,7 @@ class World:
                     self.board[self.agent.X][self.agent.Y] == self.TileType.BLANK
             elif action == ActionType.SHOOT:
                 if self.agent.has_arrow:
-                    pass    # TODO: Check if wumpus is in front of agent. If it is, kill it.
+                    pass    # TODO: Check if wumpus is in front of agent. If it is, kill it and send scream signal.
             elif action == ActionType.CLIMB:
                 if (self.agent.X, self.agent.Y) == (0, 0) and self.agent.has_gold:
                     self.score += 1000
