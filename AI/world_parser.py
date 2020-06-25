@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
-from action import ActionType
-from ai import AI
+from .action import ActionType
+from .ai import AI
 
 
 class World:
@@ -49,7 +49,7 @@ class World:
 
             if action == ActionType.FORWARD:
                 if self.agent.direction_index == 3:     # UP
-                    if self.agent.Y + 1 > 0:
+                    if self.agent.Y + 1 > 3:
                         self.send_bump = True
                     self.agent.Y = min(self.agent.Y + 1, 3)
                 elif self.agent.direction_index == 1:   # DOWN
@@ -109,8 +109,7 @@ class World:
     def get_senses(self) -> [bool]:
         """
         Returns a list of boolean values based on flags set in the class.
-        The list follows a format of [stench, breeze, glitter, bump, scream], as specified in the
-        book Artificial Intelligence: A Modern Approach by Peter Norvig and Stuart J. Russell.
+        The list follows a format of [stench, breeze, glitter, bump, scream].
         """
         for (x, y) in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
             new_x = x + self.agent.X

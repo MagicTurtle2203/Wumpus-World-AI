@@ -1,4 +1,4 @@
-from action import ActionType
+from .action import ActionType
 
 
 class ManualAI:
@@ -21,9 +21,12 @@ class ManualAI:
         }
 
     def get_action(self, sensors: [bool]) -> ActionType:
-        for idx, sense in enumerate(sensors):
-            if sense:
-                print(self.text[idx])
+        if any(sensors):
+            for idx, sense in enumerate(sensors):
+                if sense:
+                    print(self.text[idx])
+        else:
+            print("You don't detect anything.")
 
         print()
 
