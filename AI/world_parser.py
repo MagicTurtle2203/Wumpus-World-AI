@@ -1,7 +1,6 @@
 from enum import Enum, auto
 
 from .action import ActionType
-from .ai import AI
 
 
 class World:
@@ -22,8 +21,8 @@ class World:
         WUMPUS = auto()
         PIT = auto()
 
-    def __init__(self, filename, _AI=AI(), debug=False):
-        self.AI = _AI
+    def __init__(self, filename, AI_type, debug=False):
+        self.AI = AI_type
         self.agent = self.Agent()
         self.score = 0
 

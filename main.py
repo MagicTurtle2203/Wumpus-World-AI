@@ -20,14 +20,37 @@ if __name__ == "__main__":
 
     if filepath.exists():
         if filepath.is_dir():
-            pass
+            num_worlds = 0
+            total_success = 0
+            scores = []
+
+            for worldpath in filepath.iterdir():
+                num_worlds += 1
+
+                if manual:
+                    AI_type = manual_ai.ManualAI()
+                else:
+                    AI_type = ai.AI()
+
+                world = world_parser.World(worldpath, AI_type, debug)
+                success, score = world.run()
+
+                if success:
+                    total_success += 1
+
+                scores.append(score)
+
+            print("---------------Your agent's results:---------------")
+            print(f"Success rate:\t{(total_success/num_worlds)*100:.2f}%")
+            print(f"Average score:\t{sum(scores)/num_worlds:.2f}")
+
         elif filepath.is_file():
             if manual:
-                AI = manual_ai.ManualAI()
+                AI_type = manual_ai.ManualAI()
             else:
-                AI = ai.AI()
+                AI_type = ai.AI()
 
-            world = world_parser.World(filepath, AI, debug)
+            world = world_parser.World(filepath, AI_type, debug)
             success, score = world.run()
 
             if success:
