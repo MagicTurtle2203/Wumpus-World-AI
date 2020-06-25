@@ -39,10 +39,10 @@ class World:
         with open(filename) as file:
             self.board = self.create_board(file)
 
-    def run(self) -> int:
-        """
-        Handles all actions of the AI agent.
-        """
+    def run(self) -> (bool, int):
+        """Handles all actions of the AI agent."""
+        suceeded = False
+
         while True:
             action = self.AI.get_action(self.get_senses())
             self.score -= 1
@@ -100,11 +100,13 @@ class World:
             elif action == ActionType.CLIMB:
                 if (self.agent.X, self.agent.Y) == (0, 0) and self.agent.has_gold:
                     self.score += 1000
+                    suceeded = True
                     break
-            else:   # For testing only
-                break
+            # For testing only
+            # else:
+            #     break
 
-        return self.score
+        return suceeded, self.score
 
     def get_senses(self) -> [bool]:
         """

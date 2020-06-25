@@ -28,8 +28,12 @@ if __name__ == "__main__":
                 AI = ai.AI()
 
             world = world_parser.World(filepath, AI, debug)
-            world.run()
+            success, score = world.run()
 
-            print(f"score: {world.score}")
+            if success:
+                print("WORLD COMPLETED")
+            else:
+                print("WORLD FAILED")
+            print(f"SCORE: {score}")
     else:
         print("ERROR: Directory or file does not exist!")
