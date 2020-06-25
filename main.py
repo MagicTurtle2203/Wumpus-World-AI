@@ -41,6 +41,7 @@ if __name__ == "__main__":
                 scores.append(score)
 
             print("---------------Your agent's results:---------------")
+            print(f"Worlds attempted: {num_worlds}\tWorlds succeeded: {total_success}")
             print(f"Success rate:\t{(total_success/num_worlds)*100:.2f}%")
             print(f"Average score:\t{sum(scores)/num_worlds:.2f}")
 
